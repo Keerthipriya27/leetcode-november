@@ -1,0 +1,48 @@
+class Solution:
+    def findXSum(self, nums: List[int], k: int, x: int) -> List[int]:
+        freq = defaultdict(int)
+        top, rest = SortedList(), SortedList()
+        top_sum = 0
+        ans = []
+        def move_up():
+            nonlocal top_sum
+            while len(top) < x and rest:
+                f, v = rest.pop()
+                top.add((f, v))
+                top_sum += f * v
+            while rest and top and rest[-1] > top[0]:
+                fr, vr = rest.pop()
+                ft, vt = top.pop(0)
+                rest.add((ft, vt))
+                top.add((fr, vr))
+                top_sum += fr * vr - ft * vt
+        def add(v):
+            nonlocal top_sum
+            f = freq[v]
+            if (f, v) in top:
+                top.remove((f, v))
+                top_sum -= f * v
+            elif (f, v) in rest:
+                rest.remove((f, v))
+            freq[v] += 1
+            rest.add((freq[v], v))
+            move_up()
+        def remove(v):
+            nonlocal top_sum
+            f = freq[v]
+            if (f, v) in top:
+                top.remove((f, v))
+                top_sum -= f * v
+            elif (f, v) in rest:
+                rest.remove((f, v))
+            freq[v] -= 1
+            if freq[v] > 0:
+                rest.add((freq[v], v))
+            move_up()
+        for i, num in enumerate(nums):
+            add(num)
+            if i >= k:
+                remove(nums[i - k])
+            if i >= k - 1:
+                ans.append(top_sum)
+        return ans
