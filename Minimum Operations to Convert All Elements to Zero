@@ -1,0 +1,34 @@
+class Solution:
+    def minOperations(self, nums: List[int]) -> int:
+        def count_ops(arr):
+            if not arr or all(x == 0 for x in arr):
+                return 0            
+            min_val = min(x for x in arr if x > 0)
+            ops = 1
+            segments = []
+            current_segment = []            
+            for val in arr:
+                if val == min_val:
+                    if current_segment:
+                        segments.append(current_segment)
+                        current_segment = []
+                else:
+                    current_segment.append(val)            
+            if current_segment:
+                segments.append(current_segment)            
+            for segment in segments:
+                ops += count_ops(segment)            
+            return ops        
+        segments = []
+        current = []        
+        for num in nums:
+            if num == 0:
+                if current:
+                    segments.append(current)
+                    current = []
+            else:
+                current.append(num)        
+        if current:
+            segments.append(current)        
+        total_ops = sum(count_ops(seg) for seg in segments)        
+        return total_ops
